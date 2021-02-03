@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaSectionComponent } from './schema-section.component';
 import { RouterModule } from '@angular/router';
 import { Topic, TopicsService } from '../../shared/services/topics.service';
@@ -18,13 +18,14 @@ import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { Location } from '@angular/common';
 import { LoginComponent } from '../../login/login.component';
+import { FormsModule } from '@angular/forms';
 
 describe('SchemaSectionComponent', () => {
     let component: SchemaSectionComponent;
     let fixture: ComponentFixture<SchemaSectionComponent>;
     let topic: Topic;
 
-    beforeEach(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [SchemaSectionComponent],
             imports: [
@@ -34,7 +35,8 @@ describe('SchemaSectionComponent', () => {
                 HttpClientTestingModule,
                 RouterTestingModule,
                 BrowserAnimationsModule,
-                PageHeaderModule
+                PageHeaderModule,
+                FormsModule
             ],
             providers: [
                 RouterModule,
@@ -85,7 +87,7 @@ describe('SchemaSectionComponent', () => {
         };
         component.topic = of(topic);
 
-    });
+    }));
 
 
     it('should create', () => {
@@ -99,14 +101,19 @@ describe('SchemaSectionComponent', () => {
         const serviceSpy: jasmine.Spy = spyOn(topicsService, 'getTopicSchemas').and.returnValue(Promise.resolve([{
             id: '123',
             topicName: 'myTopic',
+            createdBy: 'someUser',
+            createdAt: 'someTime',
             schemaVersion: 1,
             jsonSchema: '{}',
             isLatest: false
         }, {
-            id: '123',
+            id: '1234',
             topicName: 'myTopic',
+            createdBy: 'someUser2',
+            createdAt: 'someTime2',
             schemaVersion: 2,
             jsonSchema: '{"e","f"}',
+            changeDescription: 'a change2',
             isLatest: true
         }]));
         const envSpy: jasmine.Spy = spyOn(environmentsService, 'getCurrentEnvironment')
@@ -128,17 +135,15 @@ describe('SchemaSectionComponent', () => {
             }
 
         }));
+        fixture.detectChanges();
         component.editSchemaMode = false;
         const debugElement = fixture.debugElement;
-
-        topicsService.getTopicSchemas(topic.name, 'devtest').then();
         component.ngOnInit();
-
         fixture.detectChanges();
         expect(serviceSpy).toHaveBeenCalled();
         expect(envSpy).toHaveBeenCalled();
         expect(serverInfoSpy).toHaveBeenCalled();
-        expect(debugElement.query(By.css('#schemaDeleteButton'))).toBeDefined();
+        expect(debugElement.query(By.css('#schemaDeleteButton'))).toBeTruthy();
 
     }));
 

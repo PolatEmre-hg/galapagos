@@ -115,4 +115,14 @@ export class SchemaSectionComponent implements OnInit {
             }).finally(() => (this.loadingSchemas = false));
     }
 
+    async topicSchemasIsEmpty() {
+        const x = (await this.topicSchemas).length;
+        return x;
+    }
+
+    async topicSchemasx(): Promise<SchemaMetadata[]> {
+        const y = await this.topicSchemas;
+        console.log(y);
+        return y;
+    }
 }
